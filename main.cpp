@@ -55,6 +55,7 @@ void quitSDL(SDL_Window* window, SDL_Renderer* renderer) //giai phong SDL
 
 int main(int argc, char* argv[])
 {
+    //test
     SDL_Window* window;
     SDL_Renderer* renderer;
     initSDL(window, renderer);
