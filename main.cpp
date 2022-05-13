@@ -1,11 +1,18 @@
 #include <iostream>
 #include <SDL.h>
+#include <SDL_image.h>
+#include <SDL_ttf.h>
 
 using namespace std;
 
 const int SCREEN_WIDTH = 800;
 const int SCREEN_HEIGHT = 600;
 const string WINDOW_TITLE = "Quicker, Smarter";
+
+SDL_Window* window=NULL;
+SDL_Renderer* renderer=NULL;
+SDL_Texture* texture=NULL;
+TTF_Font* font=NULL;
 
 void logSDLError(std::ostream& os, const std::string &msg, bool fatal)
 {
@@ -55,16 +62,14 @@ void quitSDL(SDL_Window* window, SDL_Renderer* renderer) //giai phong SDL
 
 int main(int argc, char* argv[])
 {
-    //test
-    SDL_Window* window;
-    SDL_Renderer* renderer;
-    initSDL(window, renderer);
+    srand(time(NULL));
+    //random 0->4
+    int pic = 4;
+    string path_img = string("img/test/picture") + convert_to_String(pic) + ".bmp";
+    SDL_Surface* image = SDL_LoadBMP(path.c_str());
+    texture = SDL_CreateTextureFromSurface(renderer , image);
+    SDL_FreeSurface(image);
 
-    // Your drawing code here
-    // use SDL_RenderPresent(renderer) to show it
-
-    waitUntilKeyPressed();
-    quitSDL(window, renderer);
     return 0;
 
 }
