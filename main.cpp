@@ -1,4 +1,4 @@
-#include <iostream>
+#include<bits/stdc++.h>
 #include <SDL.h>
 #include <SDL_image.h>
 #include <SDL_ttf.h>
@@ -59,6 +59,16 @@ void quitSDL(SDL_Window* window, SDL_Renderer* renderer) //giai phong SDL
 	SDL_DestroyWindow(window); //giai phong bo nho quan ly cua so
 	SDL_Quit();
 }
+//--------------------------------------------------------------------------------------
+string      convert_to_String(int num){
+    string res = "";
+    while (num){
+        res += num%10;
+        num /= 10;
+    }
+    reverse(res.begin() , res.end());
+    return res;
+}
 
 int main(int argc, char* argv[])
 {
@@ -66,9 +76,11 @@ int main(int argc, char* argv[])
     //random 0->4
     int pic = 4;
     string path_img = string("img/test/picture") + convert_to_String(pic) + ".bmp";
-    SDL_Surface* image = SDL_LoadBMP(path.c_str());
+    SDL_Surface* image = SDL_LoadBMP(path_img.c_str());
     texture = SDL_CreateTextureFromSurface(renderer , image);
     SDL_FreeSurface(image);
+
+    waitUntilKeyPressed();
 
     return 0;
 
