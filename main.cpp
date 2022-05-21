@@ -5,16 +5,20 @@
 
 using namespace std;
 
-const int SCREEN_WIDTH = 800;
+const int SCREEN_WIDTH = 600;
 const int SCREEN_HEIGHT = 600;
 const string WINDOW_TITLE = "Quicker, Smarter";
+
+const int SIZE = 362880+10;
 
 SDL_Window* window=NULL;
 SDL_Renderer* renderer=NULL;
 SDL_Texture* texture=NULL;
 TTF_Font* font=NULL;
 
-void logSDLError(std::ostream& os, const std::string &msg, bool fatal)
+int rankP[SIZE];
+
+void    logSDLError(std::ostream& os, const std::string &msg, bool fatal)
 {
     os << msg << " Error: " << SDL_GetError() << std::endl;
     if (fatal) {
@@ -23,7 +27,7 @@ void logSDLError(std::ostream& os, const std::string &msg, bool fatal)
     }
 }
 
-void initSDL() // khoi tao SDL
+void    initSDL() // khoi tao SDL
 {
     if (SDL_Init(SDL_INIT_EVERYTHING)){
         logSDLError(std::cout , "SDL INIT" , true);
@@ -41,8 +45,6 @@ void initSDL() // khoi tao SDL
     renderer = SDL_CreateRenderer(window , -1 , SDL_RENDERER_ACCELERATED|SDL_RENDERER_PRESENTVSYNC);
     //the renderer uses hardware acceleration
     //present is synchronized with the refresh rate
-    SDL_SetRenderDrawColor(renderer , 0 , 0 , 0 , 0);
-
     SDL_RenderSetLogicalSize(renderer,SCREEN_WIDTH,SCREEN_HEIGHT);
     //?
 
@@ -61,8 +63,7 @@ void initSDL() // khoi tao SDL
     }
 }
 
-void waitUntilKeyPressed()
-{
+void    waitUntilKeyPressed(){
     SDL_Event e;
     while (true) {
         if (SDL_WaitEvent(&e) != 0 && (e.type == SDL_KEYDOWN || e.type == SDL_QUIT))   return;
@@ -70,7 +71,7 @@ void waitUntilKeyPressed()
     }
 }
 
-void quitSDL(SDL_Window* window, SDL_Renderer* renderer) //giai phong SDL
+void    quitSDL() //giai phong SDL
 {
 	TTF_CloseFont(font);
     TTF_Quit();
@@ -83,30 +84,50 @@ void quitSDL(SDL_Window* window, SDL_Renderer* renderer) //giai phong SDL
 string      convert_to_String(int num){
     string res = "";
     while (num){
-        res += num%10;
+        res += (char)(num%10 + '0');
         num /= 10;
     }
     reverse(res.begin() , res.end());
     return res;
 }
+//--------------------------------------------------------------------------------------
 
-SDL_Texture*    loadTexture(std::string path){
-    SDL_Texture* newTexture = NULL;
-    SDL_Surface* loadedSurface = IMG_Load(path.c_str());
-    if (loadedSurface == NULL){
-        logSDLError(std::cout , "Load Texture" , true);
-    }
-    else{
-        newTexture = SDL_CreateTextureFromSurface(renderer , loadedSurface);
-        if (newTexture == NULL){
-            logSDLError(std::cout , "Create Texture From Surface" , true);
-        }
-        SDL_FreeSurface(loadedSurface);
-    }
-    return newTexture;
+void    open(){
+    freopen("aa.out","w",stdout);
 }
 
-//--------------------------------------------------------------------------------------
+void    initListPer(){
+    int cnt = 0;
+    rankP[cnt] = 123456789;
+
+    vector <int> V;
+    for (int i=1; i<=9; ++i){
+        V.push_back(i);
+    }
+
+    //Sinh ra tat ca hoan vi theo thu tu
+    while (next_permutation(V.begin() , V.end())){
+        int val = 0;
+        for (auto i: V){
+            val = val*10 + i;
+        }
+        rankP[++cnt] = val;
+        //cout<<cnt<<" = "<<rankP[cnt]<<"\n";
+    }
+}
+
+int     chooseLevel(){
+
+}
+
+void    BFS(){
+    //In ra tat ca hoan vi cua 9 so
+    initListPer();
+}
+
+void    start_game(int level){
+    BFS();
+}
 
 int main(int argc, char* argv[])
 {
@@ -115,27 +136,32 @@ int main(int argc, char* argv[])
 
     //random 0->4
     int pic = 4;
-    string path_img = string("img/test/picture") + convert_to_String(pic) + ".bmp";
-    cout<<path_img;
-    return 0;
-    SDL_Surface* image = SDL_LoadBMP(path_img.c_str());
-    SDL_Surface* screen = SDL_GetWindowSurface(window);
-    texture = loadTexture(path_img.c_str());
-    //SDL_FreeSurface(image);
-
-    bool quit = false;
-    SDL_Event e;
-    while (!quit){
-        while (SDL_PollEvent(&e) != 0){
-            if (e.type == SDL_QUIT){
-                quit = true;
-            }
-        }
-        SDL_RenderClear(renderer);
-        SDL_RenderCopy(renderer , texture , NULL , NULL);
-        SDL_RenderPresent(renderer);
+    string path_img = string("img/picture") + convert_to_String(pic) + ".bmp"; /*0-5*/
+    SDL_Surface *image = NULL;
+    image = SDL_LoadBMP(path_img.c_str());
+    if (image == NULL){
+        logSDLError(std::cout , "Image" , true);
+        return 0;
     }
 
+    open();
+
+    //choose level
+    //int level = chooseLevel();
+    int level = 1;
+
+    //start game
+    start_game(level);
+    return 0;
+
+    texture = SDL_CreateTextureFromSurface(renderer,image);
+    SDL_FreeSurface(image);
+    SDL_RenderClear(renderer);
+    SDL_RenderCopy(renderer,texture,NULL,NULL);
+    SDL_RenderPresent(renderer);
+
+    waitUntilKeyPressed();
+    quitSDL();
     return 0;
 
 }
