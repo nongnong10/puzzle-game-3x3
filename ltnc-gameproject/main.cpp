@@ -2,6 +2,7 @@
 #include <SDL.h>
 #include <SDL_image.h>
 #include <SDL_ttf.h>
+#include "Solution.h"
 
 using namespace std;
 
@@ -9,15 +10,10 @@ const int SCREEN_WIDTH = 600;
 const int SCREEN_HEIGHT = 600;
 const string WINDOW_TITLE = "Quicker, Smarter";
 
-const int SIZE = 362880+10;
-
 SDL_Window* window=NULL;
 SDL_Renderer* renderer=NULL;
 SDL_Texture* texture=NULL;
 TTF_Font* font=NULL;
-
-int rankP[SIZE];
-map <int,int> perToRank;
 
 void    logSDLError(std::ostream& os, const std::string &msg, bool fatal)
 {
@@ -97,36 +93,8 @@ void    open(){
     freopen("aa.out","w",stdout);
 }
 
-void    initListPer(){
-    int cnt = 0;
-    rankP[cnt] = 123456789;
-    perToRank[123456789] = cnt;
-
-    vector <int> V;
-    for (int i=1; i<=9; ++i){
-        V.push_back(i);
-    }
-
-    //Sinh ra tat ca hoan vi theo thu tu
-    while (next_permutation(V.begin() , V.end())){
-        int val = 0;
-        for (auto i: V){
-            val = val*10 + i;
-        }
-        rankP[++cnt] = val;
-        perToRank[val] = cnt;
-        //cout<<cnt<<" = "<<rankP[cnt]<<"\n";
-    }
-}
-
 int     chooseLevel(){
 
-}
-
-void    BFS(){
-    //In ra tat ca hoan vi cua 9 so
-    initListPer();
-    cout<<perToRank[123456879];
 }
 
 void    start_game(int level){
@@ -169,3 +137,4 @@ int main(int argc, char* argv[])
     return 0;
 
 }
+

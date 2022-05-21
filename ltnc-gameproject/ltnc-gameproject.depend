@@ -1,0 +1,14 @@
+# depslib dependency file v1.0
+1653127669 source:c:\users\hh\ltnc-gameproject\ltnc-gameproject\main.cpp
+	<bits/stdc++.h>
+	<SDL.h>
+	<SDL_image.h>
+	<SDL_ttf.h>
+	"Solution.h"
+
+1653127461 c:\users\hh\ltnc-gameproject\ltnc-gameproject\solution.h
+
+1653127683 source:c:\users\hh\ltnc-gameproject\ltnc-gameproject\solution.cpp
+	<bits/stdc++.h>
+	"Solution.h"
+
