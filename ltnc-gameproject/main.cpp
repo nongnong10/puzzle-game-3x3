@@ -3,6 +3,7 @@
 #include <SDL_image.h>
 #include <SDL_ttf.h>
 #include "Solution.h"
+#include "Board.h"
 
 using namespace std;
 
@@ -15,6 +16,7 @@ SDL_Renderer* renderer=NULL;
 SDL_Texture* texture=NULL;
 TTF_Font* font=NULL;
 int     start;
+int     N = 3;
 
 void    logSDLError(std::ostream& os, const std::string &msg, bool fatal)
 {
@@ -99,7 +101,7 @@ void    show_instruction(){
 }
 
 int     chooseLevel(){
-
+    return 0;
 }
 
 SDL_Rect    grid(int pos){
@@ -109,7 +111,21 @@ SDL_Rect    grid(int pos){
 }
 
 void    show_board(Board B){
+    SDL_RenderClear(renderer);
+    SDL_Rect scrR , dstR;
 
+    for (int i=0; i<N; ++i){
+        for (int j=0; j<N; ++j){
+            //blank
+            if (B.A[i][j] == 1)     continue;
+
+            scrR = grid(B.A[i][j] - 1);
+            dstR = grid(i*N + j);
+            SDL_RenderCopy(renderer , texture , &scrR , &dstR);
+        }
+    }
+
+    SDL_RenderPresent(renderer);
 }
 void    start_game(int level){
     BFS();
@@ -120,7 +136,7 @@ void    start_game(int level){
     SDL_RenderClear(renderer);
     SDL_RenderCopy(renderer , texture , NULL , NULL);
     SDL_RenderPresent(renderer);
-    SDL_Delay(4000);
+    SDL_Delay(1000);
 
     //Timing
     start = SDL_GetTicks();
