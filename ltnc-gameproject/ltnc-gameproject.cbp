@@ -37,6 +37,7 @@
 		<Unit filename="Solution.cpp" />
 		<Unit filename="Solution.h" />
 		<Unit filename="aa.out" />
+		<Unit filename="level.txt" />
 		<Unit filename="main.cpp" />
 		<Extensions>
 			<code_completion />

@@ -144,10 +144,31 @@ void    start_game(int level){
     //Make board
     Board B = Board(rd_level(level));
     show_board(B);
+
+    //Run game
+    SDL_Event   event;
+    bool quit = false;
+
+    while (!quit){
+        while (SDL_PollEvent(&event) != 0){
+            if (event.type == SDL_QUIT){
+                quit = true;
+            }
+            else
+            if (event.type == SDL_KEYDOWN){
+                switch (event.key.keysym.sym){
+
+                }
+            }
+            if (B.getID() == 123456789){
+                cerr << "GAME OVER !!!" << "\n";
+                break;
+            }
+        }
+    }
 }
 
-int main(int argc, char* argv[])
-{
+int main(int argc, char* argv[]){
     srand(time(NULL));
     initSDL();
 
