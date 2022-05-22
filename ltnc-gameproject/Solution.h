@@ -3,6 +3,7 @@
 
 void    initListPer();
 void    BFS();
+int     trace(int p);
 int     random(int l, int r);
 int     rd_level(int level);
 

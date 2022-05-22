@@ -94,6 +94,10 @@ void    BFS(){
     }*/
 }
 
+int     trace(int p){
+    return pre[perToRank[p]];
+}
+
 int     random(int l, int r){
     return l + rand()%(r-l+1);
 }

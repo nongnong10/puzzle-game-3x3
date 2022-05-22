@@ -170,27 +170,6 @@ void    moveBoard(Board &A , Board B){
     A = B;
 }
 
-/*
-void moveBoard(Board &A, Board B)
-    {
-        int step=20, delay=4;
-        SDL_Rect srcR=grid(B.blank), destR=grid(A.blank);
-
-        while (abs(srcR.x-destR.x) >= step){
-            int ki=(srcR.x-destR.x)/abs(srcR.x-destR.x);
-            srcR.x-=ki*step;
-            gap_move(A,B,srcR);
-            SDL_Delay(delay);
-        }
-        while (abs(srcR.y-destR.y) >= step){
-            int ki=(srcR.y-destR.y)/abs(srcR.y-destR.y);
-            srcR.y-=ki*step;
-            gap_move(A,B,srcR);
-            SDL_Delay(delay);
-        }
-        A=B;
-    }
-*/
 void    start_game(int level){
     BFS();
     //instruction
@@ -231,6 +210,17 @@ void    start_game(int level){
                         }
                         case SDLK_RIGHT:{
                             moveBoard(B,B.moveLeft());
+                            break;
+                        }
+                        case SDLK_s:{
+                            while (B.getID() != 123456789){
+                                int direction = trace(B.getID());
+                                if (direction == 1)     moveBoard(B , B.moveDown());
+                                if (direction == 2)     moveBoard(B , B.moveUp());
+                                if (direction == 3)     moveBoard(B , B.moveRight());
+                                if (direction == 4)     moveBoard(B , B.moveLeft());
+                                SDL_Delay(40);
+                            }
                             break;
                         }
                     }
@@ -282,4 +272,3 @@ int main(int argc, char* argv[]){
     return 0;
 
 }
-
