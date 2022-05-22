@@ -127,6 +127,48 @@ void    show_board(Board B){
 
     SDL_RenderPresent(renderer);
 }
+
+void    gap_move(Board A, Board B, SDL_Rect moving){
+    SDL_RenderClear(renderer);
+    SDL_Rect srcR , dstR;
+    for (int i=0; i<N; ++i){
+        for (int j=0; j<N; ++j){
+            srcR = grid(A.A[i][j] - 1);
+            dstR = grid(i * N + j);
+            if (A.A[i][j] == 1)     continue;
+            if (B.A[i][j] == 1){
+                dstR = moving;
+            }
+            SDL_RenderCopy(renderer , texture , &srcR , &dstR);
+        }
+        SDL_RenderPresent(renderer);
+    }
+}
+
+void    move_board(Board &A , Board B){
+    int speed = 20, delay = 4;
+    SDL_Rect scrR = grid(B.blank);
+    SDL_Rect dstR = grid(A.blank);
+
+    //Move left or right
+    while (abs(scrR.x - dstR.x) >= 0){
+        int mov = (scrR.x - dstR.x) / abs(scrR.x - dstR.x);
+        scrR.x -= speed * mov;
+        gap_move(A , B , scrR);
+        SDL_Delay(delay);
+    }
+
+    //Move up or down
+    while (abs(scrR.y - dstR.y) >= 0){
+        int mov = (scrR.y - dstR.y) / abs(scrR.y - dstR.y);
+        scrR.y -= speed * mov;
+        gap_move(A , B , scrR);
+        SDL_Delay(delay);
+    }
+
+    A = B;
+}
+
 void    start_game(int level){
     BFS();
     //instruction
