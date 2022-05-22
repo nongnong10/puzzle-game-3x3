@@ -14,6 +14,7 @@ SDL_Window* window=NULL;
 SDL_Renderer* renderer=NULL;
 SDL_Texture* texture=NULL;
 TTF_Font* font=NULL;
+int     start;
 
 void    logSDLError(std::ostream& os, const std::string &msg, bool fatal)
 {
@@ -93,12 +94,40 @@ void    open(){
     freopen("aa.out","w",stdout);
 }
 
+void    show_instruction(){
+
+}
+
 int     chooseLevel(){
 
 }
 
+SDL_Rect    grid(int pos){
+    int x = (pos % N) * (SCREEN_WIDTH / N);
+    int y = (pos / N) * (SCREEN_HEIGHT / N);
+    return SDL_Rect{x , y , SCREEN_WIDTH/N , SCREEN_HEIGHT/N};
+}
+
+void    show_board(Board B){
+
+}
 void    start_game(int level){
     BFS();
+    //instruction
+    show_instruction();
+
+    //Render final image in 4 seconds
+    SDL_RenderClear(renderer);
+    SDL_RenderCopy(renderer , texture , NULL , NULL);
+    SDL_RenderPresent(renderer);
+    SDL_Delay(4000);
+
+    //Timing
+    start = SDL_GetTicks();
+
+    //Make board
+    Board B = Board(rd_level(level));
+    show_board(B);
 }
 
 int main(int argc, char* argv[])
@@ -115,6 +144,8 @@ int main(int argc, char* argv[])
         logSDLError(std::cout , "Image" , true);
         return 0;
     }
+    texture = SDL_CreateTextureFromSurface(renderer,image);
+    SDL_FreeSurface(image);
 
     open();
 
@@ -126,7 +157,7 @@ int main(int argc, char* argv[])
     start_game(level);
     return 0;
 
-    texture = SDL_CreateTextureFromSurface(renderer,image);
+
     SDL_FreeSurface(image);
     SDL_RenderClear(renderer);
     SDL_RenderCopy(renderer,texture,NULL,NULL);
