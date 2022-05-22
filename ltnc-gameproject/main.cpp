@@ -9,6 +9,7 @@ using namespace std;
 
 const int SCREEN_WIDTH = 600;
 const int SCREEN_HEIGHT = 600;
+const int INF = 1e6+9;
 const string WINDOW_TITLE = "Quicker, Smarter";
 
 SDL_Window* window=NULL;
@@ -17,6 +18,7 @@ SDL_Texture* texture=NULL;
 TTF_Font* font=NULL;
 int     start;
 int     N = 3;
+int     cur_s, cur_m;
 
 void    logSDLError(std::ostream& os, const std::string &msg, bool fatal)
 {
@@ -82,6 +84,7 @@ void    quitSDL() //giai phong SDL
 }
 //--------------------------------------------------------------------------------------
 string      convert_to_String(int num){
+    if (num <= 0)   return "0";
     string res = "";
     while (num){
         res += (char)(num%10 + '0');
@@ -145,7 +148,6 @@ void    gap_move(Board A, Board B, SDL_Rect moving){
     SDL_RenderPresent(renderer);
 }
 
-
 void    moveBoard(Board &A , Board B){
     int speed = 20, delay = 4;
     SDL_Rect scrR = grid(B.blank);
@@ -170,6 +172,86 @@ void    moveBoard(Board &A , Board B){
     A = B;
 }
 
+void    write(const char *t, const SDL_Color &color, SDL_Rect *pos){
+    SDL_Surface* message = TTF_RenderText_Solid(font , t , color);
+    SDL_Texture* text = SDL_CreateTextureFromSurface(renderer , message);
+    pos->w = message->w;
+    pos->h = message->h;
+    SDL_RenderCopy(renderer , text , NULL , pos);
+    SDL_DestroyTexture(text);
+    SDL_FreeSurface(message);
+}
+
+void    score_board(){
+    SDL_Event event;
+    while (SDL_WaitEvent(&event)){
+        switch  (event.type){
+            case SDL_KEYUP:
+                switch(event.key.keysym.sym){
+                    case SDLK_b: return;
+                }
+            default:{
+                SDL_RenderClear(renderer);
+                int time = SDL_GetTicks() - start;
+                int s = time / 1000;
+                int m = s / 60;
+                s = s % 60;
+
+                //Current time
+                SDL_Color   color = {222,237,39,255};
+                SDL_Rect    pos = {180,100,0,0};
+                string tim = "Current time: " + convert_to_String(m) + " min " + convert_to_String(s) + " sec.";
+                write(tim.c_str() , color , &pos);
+
+                //Scoreboard
+                color = {186,74,202,255};
+                pos = {200,175,0,0};
+                tim = "~~ SCOREBOARD ~~";
+                write(tim.c_str() , color , &pos);
+
+                //Top high score
+                ifstream sbfile ("score.txt");
+                color = {243,75,33,255};
+                for (int i=1; i<=3; ++i){
+                    sbfile >> m >> s;
+                    if (m > INF || s > INF) m = s = 0;
+                    pos.x = 185;
+                    pos.y += 50;
+                    tim = "TOP " + convert_to_String(i) + " : " + convert_to_String(m) + " min " + convert_to_String(s) + " sec.";
+                    write(tim.c_str() , color , &pos);
+                }
+                sbfile.close();
+                SDL_RenderPresent(renderer);
+                break;
+            }
+        }
+    }
+}
+
+void    update_score(){
+    int time = SDL_GetTicks() - start;
+    cur_s = time / 1000;
+    cur_m = cur_s / 60;
+    cur_s %= 60;
+    vector <pair<int,int>> V; V.clear();
+
+    ifstream sbfile("score.txt");
+    for (int i=0; i<3; ++i){
+        int m, s;
+        sbfile >> m >> s;
+        V.push_back({m , s});
+    }
+    sbfile.close();
+
+    V.push_back({cur_m , cur_s});
+    ofstream _sbfile("score.txt");
+    sort(V.begin() , V.end());
+    for (int i=0; i<3; ++i){
+        _sbfile << V[i].first << " " << V[i].second <<"\n";
+    }
+    _sbfile.close();
+}
+
 void    start_game(int level){
     BFS();
     //instruction
@@ -191,9 +273,10 @@ void    start_game(int level){
     //Run game
     SDL_Event   event;
     bool quit = false;
+    int sol = 0;
 
     while (SDL_WaitEvent(&event)){
-            switch (event.type){
+        switch (event.type){
                 case SDL_KEYDOWN:
                     switch(event.key.keysym.sym){
                         case SDLK_UP:{
@@ -221,6 +304,7 @@ void    start_game(int level){
                                 if (direction == 4)     moveBoard(B , B.moveLeft());
                                 SDL_Delay(40);
                             }
+                            sol = 1;
                             break;
                         }
                         case SDLK_ESCAPE:{
@@ -232,15 +316,22 @@ void    start_game(int level){
                             start = SDL_GetTicks();
                             break;
                         }
+                        case SDLK_b:{
+                            score_board();
+                            show_board(B);
+                            break;
+                        }
                     }
                 break;
             }
             if (B.getID() == 123456789){
                 cerr<<"GAME OVER!!!"<<'\n';
-                //if (!sol) update_score();
+                if (!sol) update_score();
+                //update_score();
+                //print_result();
                 break;
             }
-        }
+    }
 }
 
 int main(int argc, char* argv[]){
@@ -259,7 +350,9 @@ int main(int argc, char* argv[]){
     texture = SDL_CreateTextureFromSurface(renderer,image);
     SDL_FreeSurface(image);
 
-    open();
+    //font
+    font = TTF_OpenFont("font.ttf",24);
+    //open();
 
     //choose level
     //int level = chooseLevel();
