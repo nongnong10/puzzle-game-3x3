@@ -3,5 +3,8 @@
 
 void    initListPer();
 void    BFS();
+int     random(int l, int r);
+int     rd_level(int level);
 
 #endif // _SOLUTION_H_
+

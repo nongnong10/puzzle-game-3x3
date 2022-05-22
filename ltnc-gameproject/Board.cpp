@@ -58,7 +58,7 @@ Board Board::moveLeft(){
     return newBoard;
 }
 
-Board Board::moveUp(){
+Board Board::moveRight(){
     if (blank % 3 == 2)  return Board(getID());
     Board newBoard = *this;
     int row = blank / 3;
