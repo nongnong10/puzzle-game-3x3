@@ -1,5 +1,5 @@
 # depslib dependency file v1.0
-1653224426 source:c:\users\hh\ltnc-gameproject\ltnc-gameproject\main.cpp
+1653224793 source:c:\users\hh\ltnc-gameproject\ltnc-gameproject\main.cpp
 	<bits/stdc++.h>
 	<SDL.h>
 	<SDL_image.h>
@@ -9,7 +9,7 @@
 
 1653224467 c:\users\hh\ltnc-gameproject\ltnc-gameproject\solution.h
 
-1653185378 source:c:\users\hh\ltnc-gameproject\ltnc-gameproject\solution.cpp
+1653224557 source:c:\users\hh\ltnc-gameproject\ltnc-gameproject\solution.cpp
 	<bits/stdc++.h>
 	"Solution.h"
 	"Board.h"

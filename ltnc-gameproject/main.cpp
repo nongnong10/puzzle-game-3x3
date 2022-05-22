@@ -226,6 +226,12 @@ void    start_game(int level){
                         case SDLK_ESCAPE:{
                             return;
                         }
+                        case SDLK_r:{
+                            B = Board(rd_level(level));
+                            show_board(B);
+                            start = SDL_GetTicks();
+                            break;
+                        }
                     }
                 break;
             }
