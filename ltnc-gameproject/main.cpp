@@ -223,6 +223,9 @@ void    start_game(int level){
                             }
                             break;
                         }
+                        case SDLK_ESCAPE:{
+                            return;
+                        }
                     }
                 break;
             }
