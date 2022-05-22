@@ -141,17 +141,18 @@ void    gap_move(Board A, Board B, SDL_Rect moving){
             }
             SDL_RenderCopy(renderer , texture , &srcR , &dstR);
         }
-        SDL_RenderPresent(renderer);
     }
+    SDL_RenderPresent(renderer);
 }
 
-void    move_board(Board &A , Board B){
+
+void    moveBoard(Board &A , Board B){
     int speed = 20, delay = 4;
     SDL_Rect scrR = grid(B.blank);
     SDL_Rect dstR = grid(A.blank);
 
     //Move left or right
-    while (abs(scrR.x - dstR.x) >= 0){
+    while (abs(scrR.x - dstR.x) >= speed){
         int mov = (scrR.x - dstR.x) / abs(scrR.x - dstR.x);
         scrR.x -= speed * mov;
         gap_move(A , B , scrR);
@@ -159,7 +160,7 @@ void    move_board(Board &A , Board B){
     }
 
     //Move up or down
-    while (abs(scrR.y - dstR.y) >= 0){
+    while (abs(scrR.y - dstR.y) >= speed){
         int mov = (scrR.y - dstR.y) / abs(scrR.y - dstR.y);
         scrR.y -= speed * mov;
         gap_move(A , B , scrR);
@@ -169,6 +170,27 @@ void    move_board(Board &A , Board B){
     A = B;
 }
 
+/*
+void moveBoard(Board &A, Board B)
+    {
+        int step=20, delay=4;
+        SDL_Rect srcR=grid(B.blank), destR=grid(A.blank);
+
+        while (abs(srcR.x-destR.x) >= step){
+            int ki=(srcR.x-destR.x)/abs(srcR.x-destR.x);
+            srcR.x-=ki*step;
+            gap_move(A,B,srcR);
+            SDL_Delay(delay);
+        }
+        while (abs(srcR.y-destR.y) >= step){
+            int ki=(srcR.y-destR.y)/abs(srcR.y-destR.y);
+            srcR.y-=ki*step;
+            gap_move(A,B,srcR);
+            SDL_Delay(delay);
+        }
+        A=B;
+    }
+*/
 void    start_game(int level){
     BFS();
     //instruction
@@ -191,23 +213,35 @@ void    start_game(int level){
     SDL_Event   event;
     bool quit = false;
 
-    while (!quit){
-        while (SDL_PollEvent(&event) != 0){
-            if (event.type == SDL_QUIT){
-                quit = true;
-            }
-            else
-            if (event.type == SDL_KEYDOWN){
-                switch (event.key.keysym.sym){
-
-                }
+    while (SDL_WaitEvent(&event)){
+            switch (event.type){
+                case SDL_KEYDOWN:
+                    switch(event.key.keysym.sym){
+                        case SDLK_UP:{
+                            moveBoard(B,B.moveDown());
+                            break;
+                        }
+                        case SDLK_DOWN:{
+                            moveBoard(B,B.moveUp());
+                            break;
+                        }
+                        case SDLK_LEFT:{
+                            moveBoard(B,B.moveRight());
+                            break;
+                        }
+                        case SDLK_RIGHT:{
+                            moveBoard(B,B.moveLeft());
+                            break;
+                        }
+                    }
+                break;
             }
             if (B.getID() == 123456789){
-                cerr << "GAME OVER !!!" << "\n";
+                cerr<<"GAME OVER!!!"<<'\n';
+                //if (!sol) update_score();
                 break;
             }
         }
-    }
 }
 
 int main(int argc, char* argv[]){
@@ -234,6 +268,7 @@ int main(int argc, char* argv[]){
 
     //start game
     start_game(level);
+
     return 0;
 
 
