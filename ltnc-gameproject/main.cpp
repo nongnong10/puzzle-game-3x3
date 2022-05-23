@@ -470,7 +470,7 @@ int main(int argc, char* argv[]){
     initSDL();
 
     //random 0->4
-    int pic = 4;
+    int pic = random(0 , 4);
     string path_img = string("img/picture") + convert_to_String(pic) + ".bmp"; /*0-5*/
     SDL_Surface *image = NULL;
     image = SDL_LoadBMP(path_img.c_str());
