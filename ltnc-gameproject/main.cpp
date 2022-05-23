@@ -165,7 +165,44 @@ void    show_instruction(){
 }
 
 int     chooseLevel(){
-    return 0;
+    SDL_RenderClear(renderer);
+    string t="CHOOSE LEVEL FROM [1] TO [5]";
+    SDL_Color color={255,21,21,255};
+    SDL_Rect pos={130,200,0,0};
+    write(t.c_str(),color,&pos);
+
+    SDL_SetRenderDrawColor(renderer,200,50,50,100);
+    pos = {120,190,385,53};
+    SDL_RenderDrawRect(renderer,&pos);
+    SDL_SetRenderDrawColor(renderer,0,0,0,250);
+
+    SDL_RenderPresent(renderer);
+
+    SDL_Event   event;
+    int level = 0;
+    while (SDL_WaitEvent(&event)){
+        switch (event.type){
+            case SDL_KEYDOWN:{
+                switch (event.key.keysym.sym){
+                    case SDLK_1: level = 1; break;
+                    case SDLK_2: level = 2; break;
+                    case SDLK_3: level = 3; break;
+                    case SDLK_4: level = 4; break;
+                    case SDLK_5: level = 5; break;
+                }
+                break;
+            }
+        }
+        if (level)  break;
+    }
+
+    SDL_RenderClear(renderer);
+    t = "OKAY, LEVEL " + convert_to_String(level) + " IS LOADING...";
+    pos = {143,200,0,0};
+    write(t.c_str() , color , &pos);
+    SDL_RenderPresent(renderer);
+
+    return level;
 }
 
 SDL_Rect    grid(int pos){
@@ -425,13 +462,11 @@ int main(int argc, char* argv[]){
     //open();
 
     //choose level
-    //int level = chooseLevel();
-    int level = 1;
+    int level = chooseLevel();
 
     //start game
     start_game(level);
 
-    SDL_FreeSurface(image);
     SDL_RenderClear(renderer);
     SDL_RenderCopy(renderer,texture,NULL,NULL);
     SDL_RenderPresent(renderer);
