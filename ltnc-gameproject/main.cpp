@@ -93,6 +93,17 @@ string      convert_to_String(int num){
     reverse(res.begin() , res.end());
     return res;
 }
+
+void    write(const char *t, const SDL_Color &color, SDL_Rect *pos){
+    SDL_Surface* message = TTF_RenderText_Solid(font , t , color);
+    SDL_Texture* text = SDL_CreateTextureFromSurface(renderer , message);
+    pos->w = message->w;
+    pos->h = message->h;
+    SDL_RenderCopy(renderer , text , NULL , pos);
+    SDL_DestroyTexture(text);
+    SDL_FreeSurface(message);
+}
+
 //--------------------------------------------------------------------------------------
 
 void    open(){
@@ -100,6 +111,56 @@ void    open(){
 }
 
 void    show_instruction(){
+    bool quit = false;
+    SDL_Event e;
+
+    while (SDL_WaitEvent(&e)){
+        SDL_RenderClear(renderer);
+        string t;
+        SDL_Color   color = {98,22,254,255};
+        SDL_Rect    pos;
+
+        pos={195,100,0,0};
+        t = "-> INSTRUCTION <-";
+        write(t.c_str() , color , &pos);
+
+        pos={180,150,0,0};
+        t = "~ [S] to get solution";
+        write(t.c_str() , color , &pos);
+
+        pos={180,200,0,0};
+        t = "~ [R] to reset";
+        write(t.c_str() , color , &pos);
+
+        pos={180,250,0,0};
+        t = "~ [B] to see score board";
+        write(t.c_str() , color , &pos);
+
+        pos={180,300,0,0};
+        t = "~ [Esc] to escape";
+        write(t.c_str() , color , &pos);
+
+        color={247,30,63,255};
+        pos={155,450,0,0};
+        t="Press [SPACE] to continue...";
+        write(t.c_str(),color,&pos);
+
+        SDL_SetRenderDrawColor(renderer,114,56,220,100);
+        pos={170,80,280,280};
+        SDL_RenderDrawRect(renderer,&pos);
+        SDL_RenderPresent(renderer);
+        SDL_SetRenderDrawColor(renderer,0,0,0,255);
+
+        switch (e.type){
+            case SDL_KEYDOWN:
+                switch  (e.key.keysym.sym){
+                    case SDLK_SPACE: return;
+                    case SDLK_ESCAPE: exit(0);
+                }
+            break;
+        }
+    }
+
 
 }
 
@@ -172,16 +233,6 @@ void    moveBoard(Board &A , Board B){
     A = B;
 }
 
-void    write(const char *t, const SDL_Color &color, SDL_Rect *pos){
-    SDL_Surface* message = TTF_RenderText_Solid(font , t , color);
-    SDL_Texture* text = SDL_CreateTextureFromSurface(renderer , message);
-    pos->w = message->w;
-    pos->h = message->h;
-    SDL_RenderCopy(renderer , text , NULL , pos);
-    SDL_DestroyTexture(text);
-    SDL_FreeSurface(message);
-}
-
 void    score_board(){
     SDL_Event event;
     while (SDL_WaitEvent(&event)){
@@ -252,6 +303,20 @@ void    update_score(){
     _sbfile.close();
 }
 
+/*
+void    print_result(){
+    SDL_Event   event;
+    while (SDL_WaitEvent(&event)){
+
+    }
+    SDL_RenderClear(renderer);
+    SDL_Color  color = {186,74,202,255};
+    SDL_Rect   pos = {200,175,0,0};
+    string  tim = "~~ YOU WIN ~~";
+    write(tim.c_str() , color , &pos);
+}
+*/
+
 void    start_game(int level){
     BFS();
     //instruction
@@ -321,6 +386,11 @@ void    start_game(int level){
                             show_board(B);
                             break;
                         }
+                        case SDLK_i:{
+                            show_instruction();
+                            show_board(B);
+                            break;
+                        }
                     }
                 break;
             }
@@ -360,9 +430,6 @@ int main(int argc, char* argv[]){
 
     //start game
     start_game(level);
-
-    return 0;
-
 
     SDL_FreeSurface(image);
     SDL_RenderClear(renderer);
