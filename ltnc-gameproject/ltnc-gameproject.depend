@@ -1,5 +1,5 @@
 # depslib dependency file v1.0
-1653302786 source:c:\users\hh\ltnc-gameproject\ltnc-gameproject\main.cpp
+1653303973 source:c:\users\hh\ltnc-gameproject\ltnc-gameproject\main.cpp
 	<bits/stdc++.h>
 	<SDL.h>
 	<SDL_image.h>

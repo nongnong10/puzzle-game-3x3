@@ -30,7 +30,7 @@ void    logSDLError(std::ostream& os, const std::string &msg, bool fatal){
 }
 
 void    initSDL(){
-    if (SDL_Init(SDL_INIT_EVERYTHING)){
+    if (SDL_Init(SDL_INIT_VIDEO)){
         logSDLError(std::cout , "SDL INIT" , true);
         exit(1);
     }
@@ -41,19 +41,13 @@ void    initSDL(){
         exit(1);
     }
 
-    //Create Renderer
     renderer = SDL_CreateRenderer(window , -1 , SDL_RENDERER_ACCELERATED|SDL_RENDERER_PRESENTVSYNC);
     //the renderer uses hardware acceleration
     //present is synchronized with the refresh rate
     SDL_RenderSetLogicalSize(renderer,SCREEN_WIDTH,SCREEN_HEIGHT);
+
     if (TTF_Init() == -1){
         cout<<TTF_GetError()<<endl;
-        exit(1);
-    }
-
-    int imgFlags = IMG_INIT_PNG;
-    if (!(imgFlags & IMG_Init(imgFlags))){
-        logSDLError(std::cout , "Intialize SDL_Image" , true);
         exit(1);
     }
 }
@@ -159,25 +153,25 @@ void    show_instruction(){
 }
 
 int     chooseLevel(){
-    SDL_Event   event;
-    int level = 0;
     string t;
     SDL_Rect pos;
     SDL_Color color;
+
+    SDL_RenderClear(renderer);
+    t = "CHOOSE LEVEL FROM [1] TO [5]";
+    color={255,21,21,255};
+    pos={130,200,0,0};
+    write(t.c_str(),color,&pos);
+
+    SDL_SetRenderDrawColor(renderer,200,50,50,100);
+    pos = {120,190,385,53};
+    SDL_RenderDrawRect(renderer,&pos);
+    SDL_SetRenderDrawColor(renderer,0,0,0,250);
+    SDL_RenderPresent(renderer);
+
+    SDL_Event   event;
+    int level = 0;
     while (SDL_WaitEvent(&event)){
-        SDL_RenderClear(renderer);
-        t = "CHOOSE LEVEL FROM [1] TO [5]";
-        color={255,21,21,255};
-        pos={130,200,0,0};
-        write(t.c_str(),color,&pos);
-
-        SDL_SetRenderDrawColor(renderer,200,50,50,100);
-        pos = {120,190,385,53};
-        SDL_RenderDrawRect(renderer,&pos);
-        SDL_SetRenderDrawColor(renderer,0,0,0,250);
-
-        SDL_RenderPresent(renderer);
-
         switch (event.type){
             case SDL_KEYDOWN:{
                 switch (event.key.keysym.sym){
@@ -193,10 +187,12 @@ int     chooseLevel(){
         if (level)  break;
     }
     if (level == 0)     level = 1;
+
     SDL_RenderClear(renderer);
     t = "OKAY, LEVEL " + convert_to_String(level) + " IS LOADING...";
     pos = {143,200,0,0};
     write(t.c_str() , color , &pos);
+
     SDL_RenderPresent(renderer);
 
     return level;
@@ -477,8 +473,7 @@ int main(int argc, char* argv[]){
     //random 0->5
     int pic = random(0 , 5);
     string path_img = string("img/picture") + convert_to_String(pic) + ".bmp"; /*0-5*/
-    SDL_Surface *image = NULL;
-    image = SDL_LoadBMP(path_img.c_str());
+    SDL_Surface *image = SDL_LoadBMP(path_img.c_str());
     if (image == NULL){
         logSDLError(std::cout , "Image" , true);
         return 0;
