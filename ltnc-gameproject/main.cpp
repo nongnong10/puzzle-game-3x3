@@ -16,7 +16,8 @@ SDL_Window* window=NULL;
 SDL_Renderer* renderer=NULL;
 SDL_Texture* texture=NULL;
 TTF_Font* font=NULL;
-int     start;
+
+int     start, sol = 0;
 int     N = 3;
 int     cur_s, cur_m;
 
@@ -98,8 +99,10 @@ void    write(const char *t, const SDL_Color &color, SDL_Rect *pos){
 
 //--------------------------------------------------------------------------------------
 
-void    open(){
-    freopen("aa.out","w",stdout);
+SDL_Rect    grid(int pos){
+    int x = (pos % N) * (SCREEN_WIDTH / N);
+    int y = (pos / N) * (SCREEN_HEIGHT / N);
+    return SDL_Rect{x , y , SCREEN_WIDTH/N , SCREEN_HEIGHT/N};
 }
 
 void    show_instruction(){
@@ -156,22 +159,25 @@ void    show_instruction(){
 }
 
 int     chooseLevel(){
-    SDL_RenderClear(renderer);
-    string t="CHOOSE LEVEL FROM [1] TO [5]";
-    SDL_Color color={255,21,21,255};
-    SDL_Rect pos={130,200,0,0};
-    write(t.c_str(),color,&pos);
-
-    SDL_SetRenderDrawColor(renderer,200,50,50,100);
-    pos = {120,190,385,53};
-    SDL_RenderDrawRect(renderer,&pos);
-    SDL_SetRenderDrawColor(renderer,0,0,0,250);
-
-    SDL_RenderPresent(renderer);
-
     SDL_Event   event;
     int level = 0;
+    string t;
+    SDL_Rect pos;
+    SDL_Color color;
     while (SDL_WaitEvent(&event)){
+        SDL_RenderClear(renderer);
+        t = "CHOOSE LEVEL FROM [1] TO [5]";
+        color={255,21,21,255};
+        pos={130,200,0,0};
+        write(t.c_str(),color,&pos);
+
+        SDL_SetRenderDrawColor(renderer,200,50,50,100);
+        pos = {120,190,385,53};
+        SDL_RenderDrawRect(renderer,&pos);
+        SDL_SetRenderDrawColor(renderer,0,0,0,250);
+
+        SDL_RenderPresent(renderer);
+
         switch (event.type){
             case SDL_KEYDOWN:{
                 switch (event.key.keysym.sym){
@@ -186,7 +192,7 @@ int     chooseLevel(){
         }
         if (level)  break;
     }
-
+    if (level == 0)     level = 1;
     SDL_RenderClear(renderer);
     t = "OKAY, LEVEL " + convert_to_String(level) + " IS LOADING...";
     pos = {143,200,0,0};
@@ -194,12 +200,6 @@ int     chooseLevel(){
     SDL_RenderPresent(renderer);
 
     return level;
-}
-
-SDL_Rect    grid(int pos){
-    int x = (pos % N) * (SCREEN_WIDTH / N);
-    int y = (pos / N) * (SCREEN_HEIGHT / N);
-    return SDL_Rect{x , y , SCREEN_WIDTH/N , SCREEN_HEIGHT/N};
 }
 
 void    show_board(Board B){
@@ -337,14 +337,23 @@ void    print_result(){
         SDL_RenderClear(renderer);
         SDL_Color  color = {245, 114, 15,255};
         SDL_Rect   pos = {120,175,0,0};
-        string  t = "CONGRATULATION! YOU WIN!";
-        write(t.c_str() , color , &pos);
+        string t;
 
-        //Result
-        pos = {140,225,0,0};
-        color = {235,235,12,255};
-        t = "YOUR RESULT : " + convert_to_String(cur_m) + " min " + convert_to_String(cur_s) + " sec.";
-        write(t.c_str() , color , &pos);
+        if (sol == 0){
+            t = "CONGRATULATION! YOU WIN!";
+            write(t.c_str() , color , &pos);
+
+            //Result
+            pos = {140,225,0,0};
+            color = {235,235,12,255};
+            t = "YOUR RESULT : " + convert_to_String(cur_m) + " min " + convert_to_String(cur_s) + " sec.";
+            write(t.c_str() , color , &pos);
+        }
+        else{
+            pos = {220,175,0,0};
+            t = "YOU LOSE! :<";
+            write(t.c_str() , color , &pos);
+        }
 
         //Scoreboard
         pos = {180,300,0,0};
@@ -398,8 +407,6 @@ void    start_game(int level){
 
     //Run game
     SDL_Event   event;
-    bool quit = false;
-    int sol = 0;
 
     while (SDL_WaitEvent(&event)){
         switch (event.type){
@@ -458,8 +465,6 @@ void    start_game(int level){
             if (B.getID() == 123456789){
                 cerr<<"GAME OVER!!!"<<'\n';
                 if (!sol) update_score();
-                //update_score();
-                //print_result();
                 break;
             }
     }
@@ -469,8 +474,8 @@ int main(int argc, char* argv[]){
     srand(time(NULL));
     initSDL();
 
-    //random 0->4
-    int pic = random(0 , 4);
+    //random 0->5
+    int pic = random(0 , 5);
     string path_img = string("img/picture") + convert_to_String(pic) + ".bmp"; /*0-5*/
     SDL_Surface *image = NULL;
     image = SDL_LoadBMP(path_img.c_str());
@@ -497,6 +502,7 @@ int main(int argc, char* argv[]){
     print_result();
 
     waitUntilKeyPressed();
+
     quitSDL();
     return 0;
 
