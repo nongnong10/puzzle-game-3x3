@@ -20,8 +20,7 @@ int     start;
 int     N = 3;
 int     cur_s, cur_m;
 
-void    logSDLError(std::ostream& os, const std::string &msg, bool fatal)
-{
+void    logSDLError(std::ostream& os, const std::string &msg, bool fatal){
     os << msg << " Error: " << SDL_GetError() << std::endl;
     if (fatal) {
         SDL_Quit();
@@ -29,14 +28,12 @@ void    logSDLError(std::ostream& os, const std::string &msg, bool fatal)
     }
 }
 
-void    initSDL() // khoi tao SDL
-{
+void    initSDL(){
     if (SDL_Init(SDL_INIT_EVERYTHING)){
         logSDLError(std::cout , "SDL INIT" , true);
         exit(1);
     }
 
-    //Create Window
     window = SDL_CreateWindow(WINDOW_TITLE.c_str() , SDL_WINDOWPOS_CENTERED , SDL_WINDOWPOS_CENTERED , SCREEN_WIDTH , SCREEN_HEIGHT , SDL_WINDOW_SHOWN);
     if (window == NULL){
         logSDLError(std::cout , "Create Window" , true);
@@ -48,11 +45,6 @@ void    initSDL() // khoi tao SDL
     //the renderer uses hardware acceleration
     //present is synchronized with the refresh rate
     SDL_RenderSetLogicalSize(renderer,SCREEN_WIDTH,SCREEN_HEIGHT);
-    //?
-
-    //Initialize the truetype font API.
-    //This must be called before using other functions in this library, excepting TTF_WasInit.
-    //SDL does not have to be initialized before this call.
     if (TTF_Init() == -1){
         cout<<TTF_GetError()<<endl;
         exit(1);
@@ -111,7 +103,6 @@ void    open(){
 }
 
 void    show_instruction(){
-    bool quit = false;
     SDL_Event e;
 
     while (SDL_WaitEvent(&e)){
@@ -340,19 +331,52 @@ void    update_score(){
     _sbfile.close();
 }
 
-/*
 void    print_result(){
     SDL_Event   event;
     while (SDL_WaitEvent(&event)){
+        SDL_RenderClear(renderer);
+        SDL_Color  color = {245, 114, 15,255};
+        SDL_Rect   pos = {120,175,0,0};
+        string  t = "CONGRATULATION! YOU WIN!";
+        write(t.c_str() , color , &pos);
 
+        //Result
+        pos = {140,225,0,0};
+        color = {235,235,12,255};
+        t = "YOUR RESULT : " + convert_to_String(cur_m) + " min " + convert_to_String(cur_s) + " sec.";
+        write(t.c_str() , color , &pos);
+
+        //Scoreboard
+        pos = {180,300,0,0};
+        color = {186,74,202,255};
+        t = "~~ SCOREBOARD ~~";
+        write(t.c_str() , color , &pos);
+
+        ifstream sbfile ("score.txt");
+        int m, s;
+        color = {243,75,33,255};
+        for (int i=1; i<=3; ++i){
+            sbfile >> m >> s;
+            if (m > INF || s > INF) m = s = 0;
+            pos.x = 185;
+            pos.y += 50;
+            t = "TOP " + convert_to_String(i) + " : " + convert_to_String(m) + " min " + convert_to_String(s) + " sec.";
+            write(t.c_str() , color , &pos);
+        }
+        sbfile.close();
+
+        SDL_RenderPresent(renderer);
+
+        switch (event.type){
+            case SDL_KEYDOWN:
+                switch (event.key.keysym.sym){
+                    case SDLK_SPACE: return;
+                    case SDLK_ESCAPE: exit(0);
+                }
+            break;
+        }
     }
-    SDL_RenderClear(renderer);
-    SDL_Color  color = {186,74,202,255};
-    SDL_Rect   pos = {200,175,0,0};
-    string  tim = "~~ YOU WIN ~~";
-    write(tim.c_str() , color , &pos);
 }
-*/
 
 void    start_game(int level){
     BFS();
@@ -459,7 +483,6 @@ int main(int argc, char* argv[]){
 
     //font
     font = TTF_OpenFont("font.ttf",24);
-    //open();
 
     //choose level
     int level = chooseLevel();
@@ -470,6 +493,8 @@ int main(int argc, char* argv[]){
     SDL_RenderClear(renderer);
     SDL_RenderCopy(renderer,texture,NULL,NULL);
     SDL_RenderPresent(renderer);
+
+    print_result();
 
     waitUntilKeyPressed();
     quitSDL();
