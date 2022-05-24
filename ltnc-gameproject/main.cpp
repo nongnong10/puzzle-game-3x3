@@ -119,33 +119,33 @@ void    show_instruction(){
         SDL_Color   color = {98,22,254,255};
         SDL_Rect    pos;
 
-        pos={195,100,0,0};
+        pos={185,100,0,0};
         t = "-> INSTRUCTION <-";
         write(t.c_str() , color , &pos);
 
-        pos={180,150,0,0};
+        pos={130,150,0,0};
         t = "~ [S] to get solution";
         write(t.c_str() , color , &pos);
 
-        pos={180,200,0,0};
+        pos={130,200,0,0};
         t = "~ [R] to reset";
         write(t.c_str() , color , &pos);
 
-        pos={180,250,0,0};
+        pos={130,250,0,0};
         t = "~ [B] to see score board";
         write(t.c_str() , color , &pos);
 
-        pos={180,300,0,0};
+        pos={130,300,0,0};
         t = "~ [Esc] to escape";
         write(t.c_str() , color , &pos);
 
         color={247,30,63,255};
-        pos={155,450,0,0};
+        pos={115,400,0,0};
         t="Press [SPACE] to continue...";
         write(t.c_str(),color,&pos);
 
         SDL_SetRenderDrawColor(renderer,114,56,220,100);
-        pos={170,80,280,280};
+        pos={140,80,360,280};
         SDL_RenderDrawRect(renderer,&pos);
         SDL_RenderPresent(renderer);
         SDL_SetRenderDrawColor(renderer,0,0,0,255);
@@ -167,13 +167,13 @@ int     chooseLevel(){
     SDL_Color color;
 
     SDL_RenderClear(renderer);
-    t = "CHOOSE LEVEL FROM [1] TO [5]";
+    t = "CHOOSE LEVEL FROM 1 TO 5";
     color={255,21,21,255};
-    pos={130,200,0,0};
+    pos={120,200,0,0};
     write(t.c_str(),color,&pos);
 
     SDL_SetRenderDrawColor(renderer,200,50,50,100);
-    pos = {120,190,385,53};
+    pos = {110,190,400,53};
     SDL_RenderDrawRect(renderer,&pos);
     SDL_SetRenderDrawColor(renderer,0,0,0,250);
     SDL_RenderPresent(renderer);
@@ -199,7 +199,7 @@ int     chooseLevel(){
 
     SDL_RenderClear(renderer);
     t = "OKAY, LEVEL " + convert_to_String(level) + " IS LOADING...";
-    pos = {143,200,0,0};
+    pos = {120,200,0,0};
     write(t.c_str() , color , &pos);
 
     SDL_RenderPresent(renderer);
@@ -266,6 +266,42 @@ void    moveBoard(Board &A , Board B){
     A = B;
 }
 
+void    sboard(){
+    SDL_Event event;
+    while (SDL_WaitEvent(&event)){
+        SDL_RenderClear(renderer);
+        SDL_Color   color = {186,74,202,255};
+        SDL_Rect    pos = {200,175,0,0};
+
+        string  tim = "SCOREBOARD";
+        write(tim.c_str() , color , &pos);
+
+        //Top high score
+        ifstream sbfile ("score.txt");
+        color = {243,75,33,255};
+        for (int i=1; i<=3; ++i){
+            int m, s;
+            sbfile >> m >> s;
+            if (m > INF || s > INF) m = s = 0;
+            pos.x = 165;
+            pos.y += 50;
+            tim = "TOP " + convert_to_String(i) + " : " + convert_to_String(m) + " min " + convert_to_String(s) + " sec.";
+            write(tim.c_str() , color , &pos);
+        }
+        sbfile.close();
+        SDL_RenderPresent(renderer);
+
+        switch (event.type){
+            case SDL_KEYDOWN:
+                switch  (event.key.keysym.sym){
+                    case SDLK_SPACE: return;
+                    case SDLK_ESCAPE: exit(0);
+                }
+            break;
+        }
+    }
+}
+
 void    score_board(){
     SDL_Event event;
     while (SDL_WaitEvent(&event)){
@@ -283,14 +319,14 @@ void    score_board(){
 
                 //Current time
                 SDL_Color   color = {222,237,39,255};
-                SDL_Rect    pos = {180,100,0,0};
+                SDL_Rect    pos = {120,100,0,0};
                 string tim = "Current time: " + convert_to_String(m) + " min " + convert_to_String(s) + " sec.";
                 write(tim.c_str() , color , &pos);
 
                 //Scoreboard
                 color = {186,74,202,255};
                 pos = {200,175,0,0};
-                tim = "~~ SCOREBOARD ~~";
+                tim = "SCOREBOARD";
                 write(tim.c_str() , color , &pos);
 
                 //Top high score
@@ -299,7 +335,7 @@ void    score_board(){
                 for (int i=1; i<=3; ++i){
                     sbfile >> m >> s;
                     if (m > INF || s > INF) m = s = 0;
-                    pos.x = 185;
+                    pos.x = 165;
                     pos.y += 50;
                     tim = "TOP " + convert_to_String(i) + " : " + convert_to_String(m) + " min " + convert_to_String(s) + " sec.";
                     write(tim.c_str() , color , &pos);
@@ -347,29 +383,33 @@ void    print_result(){
     while (SDL_WaitEvent(&event)){
         SDL_RenderClear(renderer);
         SDL_Color  color = {245, 114, 15,255};
-        SDL_Rect   pos = {120,175,0,0};
+        SDL_Rect   pos = {170,175,0,0};
         string t;
 
+        font = TTF_OpenFont("WickedMouse-aGoK.ttf" , 36);
         if (sol == 0){
-            t = "CONGRATULATION! YOU WIN!";
+            pos = {110,175,0,0};
+            t = "CONGRATULATION!";
             write(t.c_str() , color , &pos);
 
             //Result
-            pos = {140,225,0,0};
+            font = TTF_OpenFont("WickedMouse-aGoK.ttf" , 24);
+            pos = {125,225,0,0};
             color = {235,235,12,255};
             t = "YOUR RESULT : " + convert_to_String(cur_m) + " min " + convert_to_String(cur_s) + " sec.";
             write(t.c_str() , color , &pos);
         }
         else{
-            pos = {220,175,0,0};
+            pos = {190,175,0,0};
             t = "YOU LOSE! :<";
             write(t.c_str() , color , &pos);
+            font = TTF_OpenFont("WickedMouse-aGoK.ttf" , 24);
         }
 
         //Scoreboard
-        pos = {180,300,0,0};
+        pos = {200,300,0,0};
         color = {186,74,202,255};
-        t = "~~ SCOREBOARD ~~";
+        t = "SCOREBOARD";
         write(t.c_str() , color , &pos);
 
         ifstream sbfile ("score.txt");
@@ -378,7 +418,7 @@ void    print_result(){
         for (int i=1; i<=3; ++i){
             sbfile >> m >> s;
             if (m > INF || s > INF) m = s = 0;
-            pos.x = 185;
+            pos.x = 165;
             pos.y += 50;
             t = "TOP " + convert_to_String(i) + " : " + convert_to_String(m) + " min " + convert_to_String(s) + " sec.";
             write(t.c_str() , color , &pos);
@@ -390,7 +430,7 @@ void    print_result(){
         switch (event.type){
             case SDL_KEYDOWN:
                 switch (event.key.keysym.sym){
-                    case SDLK_SPACE: return;
+                    case SDLK_SPACE: exit(0);
                     case SDLK_ESCAPE: exit(0);
                 }
             break;
@@ -398,10 +438,80 @@ void    print_result(){
     }
 }
 
+void    intro(){
+    //Name game
+    font = TTF_OpenFont("WickedMouse-aGoK.ttf" , 60);
+    SDL_RenderClear(renderer);
+    string t = "Quicker";
+    SDL_Rect pos = {120 , 100 , 0 , 0};
+    SDL_Color color = {242, 164, 7 , 255};
+    write(t.c_str() , color , &pos);
+
+    font = TTF_OpenFont("WickedMouse-aGoK.ttf" , 24);
+    t = "and";
+    pos = {150 , 180 , 0 , 0};
+    color = {242, 164, 7 , 255};
+    write(t.c_str() , color , &pos);
+
+    font = TTF_OpenFont("WickedMouse-aGoK.ttf" , 60);
+    t = "Quicker";
+    pos = {210 , 180 , 0 , 0};
+    color = {242, 164, 7 , 255};
+    write(t.c_str() , color , &pos);
+
+    //Start
+    font = TTF_OpenFont("WickedMouse-aGoK.ttf" , 24);
+    t = "START";
+    pos = {250 , 350 , 0 , 0};
+    color = {242, 66, 7 , 255};
+    write(t.c_str() , color , &pos);
+
+    //instruction
+    t = "instruction";
+    pos = {205 , 400 , 0 , 0};
+    write(t.c_str() , color , &pos);
+    SDL_RenderPresent(renderer);
+
+    //Scoreboard
+    t = "Score board";
+    pos = {200 , 450 , 0 , 0};
+    write(t.c_str() , color , &pos);
+    SDL_RenderPresent(renderer);
+
+    //Quit
+    t = "Quit";
+    pos = {260 , 500 , 0 , 0};
+    write(t.c_str() , color , &pos);
+    SDL_RenderPresent(renderer);
+
+    SDL_Event event;
+    while (SDL_WaitEvent(&event)){
+        switch (event.type){
+            case SDL_KEYDOWN:{
+                switch (event.key.keysym.sym){
+                    case SDLK_SPACE: return;
+                    case SDLK_ESCAPE: exit(0);
+                    case SDLK_b:{
+                        Mix_PlayChannel( -1, gMedium, 0 );
+                        sboard();
+                        return;
+                    }
+                    case SDLK_i:{
+                        Mix_PlayChannel( -1, gMedium, 0 );
+                        show_instruction();
+                        return;
+                    }
+                }
+                break;
+            }
+        }
+    }
+}
+
 void    start_game(int level){
     BFS();
     //instruction
-    show_instruction();
+    //show_instruction();
 
     //Render final image in 4 seconds
     SDL_RenderClear(renderer);
@@ -511,14 +621,15 @@ int main(int argc, char* argv[]){
     texture = SDL_CreateTextureFromSurface(renderer,image);
     SDL_FreeSurface(image);
 
-    //font
-    font = TTF_OpenFont("font.ttf",24);
-
-    //choose level
     if( Mix_PlayingMusic() == 0 )
     {
         Mix_PlayMusic( gMusic, -1 );
     }
+    intro();
+    //font
+    //font = TTF_OpenFont("font.ttf",24);
+
+    //choose level
     int level = chooseLevel();
     //start game
     start_game(level);
