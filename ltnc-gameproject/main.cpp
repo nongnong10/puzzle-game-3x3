@@ -2,6 +2,7 @@
 #include <SDL.h>
 #include <SDL_image.h>
 #include <SDL_ttf.h>
+#include <SDL_mixer.h>
 #include "Solution.h"
 #include "Board.h"
 
@@ -15,6 +16,10 @@ const string WINDOW_TITLE = "Quicker, Smarter";
 SDL_Window* window=NULL;
 SDL_Renderer* renderer=NULL;
 SDL_Texture* texture=NULL;
+Mix_Chunk *gMedium = NULL;
+Mix_Chunk *gWin = NULL;
+Mix_Chunk *gLose = NULL;
+Mix_Music *gMusic = NULL;
 TTF_Font* font=NULL;
 
 int     start, sol = 0;
@@ -30,7 +35,7 @@ void    logSDLError(std::ostream& os, const std::string &msg, bool fatal){
 }
 
 void    initSDL(){
-    if (SDL_Init(SDL_INIT_VIDEO)){
+    if (SDL_Init(SDL_INIT_VIDEO | SDL_INIT_AUDIO)){
         logSDLError(std::cout , "SDL INIT" , true);
         exit(1);
     }
@@ -50,6 +55,10 @@ void    initSDL(){
         cout<<TTF_GetError()<<endl;
         exit(1);
     }
+
+    if( Mix_OpenAudio( 44100, MIX_DEFAULT_FORMAT, 2, 2048 ) < 0 ){
+        printf( "SDL_mixer could not initialize! SDL_mixer Error: %s\n", Mix_GetError() );
+    }
 }
 
 void    waitUntilKeyPressed(){
@@ -64,10 +73,12 @@ void    quitSDL() //giai phong SDL
 {
 	TTF_CloseFont(font);
     TTF_Quit();
+    Mix_FreeChunk( gMedium ); gMedium = NULL;
     SDL_DestroyTexture(texture); texture=NULL;
     SDL_DestroyRenderer(renderer); renderer=NULL;
     SDL_DestroyWindow(window); window=NULL;
     SDL_Quit();
+    Mix_Quit();
 }
 //--------------------------------------------------------------------------------------
 string      convert_to_String(int num){
@@ -148,8 +159,6 @@ void    show_instruction(){
             break;
         }
     }
-
-
 }
 
 int     chooseLevel(){
@@ -175,11 +184,11 @@ int     chooseLevel(){
         switch (event.type){
             case SDL_KEYDOWN:{
                 switch (event.key.keysym.sym){
-                    case SDLK_1: level = 1; break;
-                    case SDLK_2: level = 2; break;
-                    case SDLK_3: level = 3; break;
-                    case SDLK_4: level = 4; break;
-                    case SDLK_5: level = 5; break;
+                    case SDLK_1: Mix_PlayChannel( -1, gMedium, 0 ), level = 1; break;
+                    case SDLK_2: Mix_PlayChannel( -1, gMedium, 0 ), level = 2; break;
+                    case SDLK_3: Mix_PlayChannel( -1, gMedium, 0 ), level = 3; break;
+                    case SDLK_4: Mix_PlayChannel( -1, gMedium, 0 ), level = 4; break;
+                    case SDLK_5: Mix_PlayChannel( -1, gMedium, 0 ), level = 5; break;
                 }
                 break;
             }
@@ -328,6 +337,12 @@ void    update_score(){
 }
 
 void    print_result(){
+    if (sol == 0){
+        Mix_PlayChannel( -1, gWin, 0 );
+    }
+    else{
+        Mix_PlayChannel( -1, gLose, 0 );
+    }
     SDL_Event   event;
     while (SDL_WaitEvent(&event)){
         SDL_RenderClear(renderer);
@@ -409,24 +424,30 @@ void    start_game(int level){
                 case SDL_KEYDOWN:
                     switch(event.key.keysym.sym){
                         case SDLK_UP:{
+                            Mix_PlayChannel( -1, gMedium, 0 );
                             moveBoard(B,B.moveDown());
                             break;
                         }
                         case SDLK_DOWN:{
                             moveBoard(B,B.moveUp());
+                            Mix_PlayChannel( -1, gMedium, 0 );
                             break;
                         }
                         case SDLK_LEFT:{
                             moveBoard(B,B.moveRight());
+                            Mix_PlayChannel( -1, gMedium, 0 );
                             break;
                         }
                         case SDLK_RIGHT:{
                             moveBoard(B,B.moveLeft());
+                            Mix_PlayChannel( -1, gMedium, 0 );
                             break;
                         }
                         case SDLK_s:{
+                            Mix_PlayChannel( -1, gMedium, 0 );
                             while (B.getID() != 123456789){
                                 int direction = trace(B.getID());
+                                Mix_PlayChannel( -1, gMedium, 0 );
                                 if (direction == 1)     moveBoard(B , B.moveDown());
                                 if (direction == 2)     moveBoard(B , B.moveUp());
                                 if (direction == 3)     moveBoard(B , B.moveRight());
@@ -437,20 +458,24 @@ void    start_game(int level){
                             break;
                         }
                         case SDLK_ESCAPE:{
+                            Mix_PlayChannel( -1, gMedium, 0 );
                             return;
                         }
                         case SDLK_r:{
+                            Mix_PlayChannel( -1, gMedium, 0 );
                             B = Board(rd_level(level));
                             show_board(B);
                             start = SDL_GetTicks();
                             break;
                         }
                         case SDLK_b:{
+                            Mix_PlayChannel( -1, gMedium, 0 );
                             score_board();
                             show_board(B);
                             break;
                         }
                         case SDLK_i:{
+                            Mix_PlayChannel( -1, gMedium, 0 );
                             show_instruction();
                             show_board(B);
                             break;
@@ -478,6 +503,11 @@ int main(int argc, char* argv[]){
         logSDLError(std::cout , "Image" , true);
         return 0;
     }
+    gMedium = Mix_LoadWAV( "mixkit-game-ball-tap-2073.wav" );
+    //gWin = Mix_LoadWAV( "mixkit-festive-melody-audio-2985.wav" );
+    gWin = Mix_LoadWAV( "mixkit-game-level-completed-2059.wav" );
+    gLose = Mix_LoadWAV( "mixkit-horror-lose-2028.wav" );
+	gMusic = Mix_LoadMUS( "mixkit-feeling-happy-5.mp3" );
     texture = SDL_CreateTextureFromSurface(renderer,image);
     SDL_FreeSurface(image);
 
@@ -485,10 +515,15 @@ int main(int argc, char* argv[]){
     font = TTF_OpenFont("font.ttf",24);
 
     //choose level
+    if( Mix_PlayingMusic() == 0 )
+    {
+        Mix_PlayMusic( gMusic, -1 );
+    }
     int level = chooseLevel();
-
     //start game
     start_game(level);
+
+    Mix_HaltMusic();
 
     SDL_RenderClear(renderer);
     SDL_RenderCopy(renderer,texture,NULL,NULL);
