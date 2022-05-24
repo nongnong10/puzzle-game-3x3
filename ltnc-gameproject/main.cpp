@@ -69,8 +69,7 @@ void    waitUntilKeyPressed(){
     }
 }
 
-void    quitSDL() //giai phong SDL
-{
+void    quitSDL(){
 	TTF_CloseFont(font);
     TTF_Quit();
     Mix_FreeChunk( gMedium ); gMedium = NULL;
@@ -613,21 +612,22 @@ int main(int argc, char* argv[]){
         logSDLError(std::cout , "Image" , true);
         return 0;
     }
+    texture = SDL_CreateTextureFromSurface(renderer,image);
+    SDL_FreeSurface(image);
+
+    //Sound effect and Music
     gMedium = Mix_LoadWAV( "mixkit-game-ball-tap-2073.wav" );
     //gWin = Mix_LoadWAV( "mixkit-festive-melody-audio-2985.wav" );
     gWin = Mix_LoadWAV( "mixkit-game-level-completed-2059.wav" );
     gLose = Mix_LoadWAV( "mixkit-horror-lose-2028.wav" );
 	gMusic = Mix_LoadMUS( "mixkit-feeling-happy-5.mp3" );
-    texture = SDL_CreateTextureFromSurface(renderer,image);
-    SDL_FreeSurface(image);
 
-    if( Mix_PlayingMusic() == 0 )
-    {
+	//Play music
+    if( Mix_PlayingMusic() == 0 ){
         Mix_PlayMusic( gMusic, -1 );
     }
+
     intro();
-    //font
-    //font = TTF_OpenFont("font.ttf",24);
 
     //choose level
     int level = chooseLevel();
